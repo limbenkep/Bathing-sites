@@ -11,10 +11,10 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="@fraction/three_fifth_fraction"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHeight_percent="@fraction/three_fifth_fraction"
-        app:layout_constraintWidth_percent= "@fraction/four_fifth_fraction"
-        />
+        app:layout_constraintWidth_percent="@fraction/four_fifth_fraction" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

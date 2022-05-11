@@ -8,13 +8,25 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view"
+        android:name="se.miun.holi1900.dt031g.bathingsites.BathingSitesFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="se.miun.holi1900.dt031g.bathingsites.BathingSitesFragment"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="@fraction/four_fifth_fraction"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addBathingSitesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:contentDescription="@string/add_button_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="@fraction/one_fifth_fraction"
+        app:srcCompat="@drawable/ic_add_circle_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
