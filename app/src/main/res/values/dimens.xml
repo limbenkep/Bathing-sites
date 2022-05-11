@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <fraction name="four_fifth_fraction">.8</fraction>
+    <fraction name="three_fifth_fraction">.6</fraction>
+    <fraction name="two_fifth_fraction">.4</fraction>
+    <fraction name="one_fifth_fraction">.2</fraction>
+    <fraction name="half_fraction">.5</fraction>
+    <fraction name="one_quarter_fraction">.25</fraction>
+    <fraction name="three_quarter_fraction">.75</fraction>
+</resources>
