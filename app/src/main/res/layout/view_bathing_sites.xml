@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHeight_percent="@fraction/four_fifth_fraction"
-        app:srcCompat="@drawable/ic_baseline_pool_24" />
+        app:srcCompat="@drawable/ic_pool_24" />
 
     <TextView
         android:id="@+id/bathSiteViewText"

@@ -17,4 +17,5 @@ public class BathingSitesFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bathing_sites, container, false);
     }
+
 }

@@ -2,6 +2,7 @@ package se.miun.holi1900.dt031g.bathingsites;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,6 +47,11 @@ public class BathingSitesView extends ConstraintLayout {
         textView = findViewById(R.id.bathSiteViewText);
         ImageView image = findViewById(R.id.bathImage);
 
+        this.setOnClickListener(view -> {
+            counter = counter + 1;
+            setTextViewText();
+        });
+
         //set the text of the bathing site view with
         // the current number of bathing sites
         setTextViewText();
@@ -59,6 +65,7 @@ public class BathingSitesView extends ConstraintLayout {
     public void setTextViewText(){
         String text = counter + " bathing sites";
         textView.setText(text);
+
     }
 
     /**
@@ -77,4 +84,5 @@ public class BathingSitesView extends ConstraintLayout {
     public  int getCounter(){
         return counter;
     }
+
 }

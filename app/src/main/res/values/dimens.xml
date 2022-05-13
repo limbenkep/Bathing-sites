@@ -7,4 +7,5 @@
     <fraction name="half_fraction">.5</fraction>
     <fraction name="one_quarter_fraction">.25</fraction>
     <fraction name="three_quarter_fraction">.75</fraction>
+    <dimen name="sixteen_dp">16dp</dimen>
 </resources>

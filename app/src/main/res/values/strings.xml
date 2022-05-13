@@ -3,4 +3,22 @@
     <string name="bath_image_description">Bathing Sites image</string>
     <string name="add_button_description">Add button</string>
     <string name="settings">Settings</string>
+
+    <string name="name">Name: </string>
+    <string name="description">Description: </string>
+    <string name="address">Address: </string>
+    <string name="latitude">Latitude: </string>
+    <string name="longitude">Longitude: </string>
+    <string name="grade">Grade: </string>
+    <string name="water_temp">Water temperature: </string>
+    <string name="date_water_temp">Date water temperature: </string>
+    <string name="delete">Delete</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="name_error_message">Name is required.</string>
+    <string name="address_error_message">Address is required.</string>
+    <string name="latitude_error_message">Latitude is required.</string>
+    <string name="longitude_error_message">Longitude is required.</string>
+    <string name="star_grading">Star grading</string>
+
 </resources>
