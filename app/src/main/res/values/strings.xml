@@ -21,7 +21,12 @@
     <string name="longitude_error_message">Longitude is required.</string>
     <string name="star_grading">Star grading</string>
     <string name="show_weather">Show weather</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="getting_weather">Getting current weather</string>
 
+
+    <string name="show_weather_dialog_title">Current weather</string>
 
     <string name="title_activity_settings">SettingsActivity</string>
 
