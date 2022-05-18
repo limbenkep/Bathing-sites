@@ -31,18 +31,17 @@
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <string name="fetch_weather_header">Fetch weather data from</string>
+    <string name="fetch_weather_key">Fetch_weather</string>
+
+    <string name="new_bathing_site_option_header">New bathing site</string>
+    <string name="new_bathing_site_option_key">new_bathing_site</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <string name="fetch_weather_settings_default_summary">https://dt031g.programvaruteknik.nu/bathingsites/weather.php</string>
+    <string name="new_bathing_site_option_message">Show new bathing site</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
 </resources>
