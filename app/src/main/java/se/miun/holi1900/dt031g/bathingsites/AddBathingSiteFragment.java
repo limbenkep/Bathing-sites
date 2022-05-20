@@ -1,9 +1,7 @@
 package se.miun.holi1900.dt031g.bathingsites;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,8 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,15 +18,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.loader.content.AsyncTaskLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,8 +35,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -100,7 +96,6 @@ public class AddBathingSiteFragment extends Fragment {
             startActivity(new Intent(requireContext(), SettingsActivity.class));
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -212,7 +207,6 @@ public class AddBathingSiteFragment extends Fragment {
         String longitudeText = longitude.getText().toString();
         String latitudeText = latitude.getText().toString();
         Uri uri;
-
         if (!latitudeText.equals("") && !longitudeText.equals("")) {
             uri = Uri.parse(WEATHER_BASE_URL)
                     .buildUpon()
@@ -228,14 +222,14 @@ public class AddBathingSiteFragment extends Fragment {
             }
             return true;
         } else if (!addressText.equals("")) {
-            uri = Uri.parse(WEATHER_BASE_URL)
-                    .buildUpon()
-                    .appendQueryParameter("q", addressText)
-                    .build();
-            DownloadWeatherAsyncTask downloadWeatherAsyncTask = new DownloadWeatherAsyncTask();
             try {
+                uri = Uri.parse(WEATHER_BASE_URL)
+                        .buildUpon()
+                        .appendQueryParameter("q", URLEncoder.encode(addressText, "UTF-8"))
+                        .build();
+                DownloadWeatherAsyncTask downloadWeatherAsyncTask = new DownloadWeatherAsyncTask();
                 downloadWeatherAsyncTask.execute(new URL(uri.toString()));
-            } catch (MalformedURLException e) {
+            } catch (UnsupportedEncodingException|MalformedURLException e) {
                 Log.e(TAG, "showWeather: " + e.getMessage());
                 e.printStackTrace();
             }
@@ -246,36 +240,6 @@ public class AddBathingSiteFragment extends Fragment {
         }
     }
 
-
-    // A dialog fragment for showing an weather
-
-    /**
-     * This class is a custom dialogFragment thet will be used to display weather information to user.
-     */
-    public static class ShowWeatherDialogFragment extends DialogFragment {
-        private final String message;
-        private final Drawable icon;
-
-        public ShowWeatherDialogFragment(String message, Drawable icon) {
-            super();
-            this.message = message;
-            this.icon = icon;
-        }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-            return new AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.show_weather_dialog_title)
-                    .setMessage(message)
-                    .setIcon(icon)
-                    .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-                    })
-                    .create();
-        }
-
-    }
-
     /**
      * This class implements the methods to execute the async task to download weather information from a URL
      * The class gets the URL as input, displays a progress dialog on screen will the weather information
@@ -284,8 +248,6 @@ public class AddBathingSiteFragment extends Fragment {
     private class DownloadWeatherAsyncTask extends AsyncTask<URL, Integer, String> {
         //custom progressDialog for show progress of file download
         private CustomProgressDialogView progressDialog;
-
-
 
         /**
          * display progress dialog
@@ -309,13 +271,11 @@ public class AddBathingSiteFragment extends Fragment {
             HttpsURLConnection connection;
             try {
                 // get a connection from url
-
                 connection = (HttpsURLConnection) url.openConnection();
 
                 StringBuilder sb = new StringBuilder();
                 BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
                 String inputLine;
-
                 //read files line for line as long as action is not cancelled and there is still lines to read.
                 while (!isCancelled() && (inputLine = in.readLine()) != null)
                     sb.append(inputLine);
@@ -327,7 +287,6 @@ public class AddBathingSiteFragment extends Fragment {
                 return "";
             }
         }
-
 
         /**
          * Convert the weather information string to JSON and Extracts overcast, temperature, and icon code
@@ -353,7 +312,7 @@ public class AddBathingSiteFragment extends Fragment {
                     String overcast = weather.getString("main");
                     String icon = weather.getString("icon");
                     JSONObject jsonMain = jsondata.getJSONObject("main");
-                    double temp = jsonMain.getDouble("temp");
+                    int temp =(int) jsonMain.getDouble("temp");
                     URL iconUrl = new URL(WEATHER_ICON_URL + icon + ".png");
                     DownloadImageFromUrlAsyncTask drawableFromUrlAsyncTask = new DownloadImageFromUrlAsyncTask();
                     // Get icon image from url using an Asynchronously. The .get() method get the
@@ -361,12 +320,12 @@ public class AddBathingSiteFragment extends Fragment {
                     // This ensures that the drawable is obtained before the ShowWeatherDialog is displayed
                     final Bitmap bitmap= drawableFromUrlAsyncTask.execute(iconUrl).get();
                     Drawable weatherIcon = new BitmapDrawable(getResources(), bitmap);
+                    TextView textView = new TextView(requireContext());
 
                     //Display weather in a dialog box.
-                    new ShowWeatherDialogFragment("Overcast " + overcast + "\n" + temp, weatherIcon).show(getChildFragmentManager(), TAG);
-
+                    new ShowWeatherDialogFragment("Overcast " + overcast + "\n" + temp
+                            + "°", weatherIcon).show(getChildFragmentManager(), TAG);
                     //Log.d("WeatherDownloadAsyncTask", "overcast: " + overcast + " temp: " + temp);
-
                 } catch (JSONException e) {
                     //Log.e("WeatherDownloadAsyncTask", "Error error converting read string to json: " + e.getMessage());
                     Toast.makeText(getContext(), "No weather information was found for the entered location.", Toast.LENGTH_SHORT).show();
@@ -378,7 +337,6 @@ public class AddBathingSiteFragment extends Fragment {
                 }
             }
         }
-
     }
 
     /**
@@ -404,7 +362,5 @@ public class AddBathingSiteFragment extends Fragment {
                 return null;
             }
         }
-
-
     }
 }
