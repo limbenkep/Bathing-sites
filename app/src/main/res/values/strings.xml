@@ -24,6 +24,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="getting_weather">Getting current weather</string>
+    <string name="weather_image_content_description">Weather icon</string>
 
 
     <string name="show_weather_dialog_title">Current weather</string>

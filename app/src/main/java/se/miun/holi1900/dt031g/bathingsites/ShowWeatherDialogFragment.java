@@ -59,7 +59,7 @@ public class ShowWeatherDialogFragment extends DialogFragment {
         title.setTypeface(null, Typeface.BOLD);
         textView.setText(message);
         Button ok_button = view.findViewById(R.id.ok_button);
-        ok_button.setOnClickListener(view1 -> requireActivity().finish());
+        ok_button.setOnClickListener(view1 -> this.dismiss());
 
     }
 }
