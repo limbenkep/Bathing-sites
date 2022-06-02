@@ -50,21 +50,24 @@ public class BathingSitesFragment extends Fragment implements BathingSitesView.O
     }
 
     private void displayRandomBathingSite(List<BathingSite> list){
-        Collections.shuffle(list);
-        Random rand = new Random();
-        BathingSite site = list.get(rand.nextInt(list.size()));
-        Log.d(TAG, "displayRandomBathingSite: " + site.siteName);
         Context context = requireContext();
-        CharSequence text = "Name: " + site.siteName + "\n"
-                + "Description: " + site.description + "\n"
-                + "Address: " + site.address + "\n"
-                + "Latitude: " + site.latitude + "\n"
-                + "Longitude: " + site.longitude + "\n"
-                + "Grade: " + site.grade;
-        int duration = Toast.LENGTH_SHORT;
+        if(list.size() !=0){
+            Collections.shuffle(list);
+            Random rand = new Random();
+            BathingSite site = list.get(rand.nextInt(list.size()));
+            Log.d(TAG, "displayRandomBathingSite: " + site.siteName);
 
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-
+            CharSequence text = "Name: " + site.siteName + "\n"
+                    + "Description: " + site.description + "\n"
+                    + "Address: " + site.address + "\n"
+                    + "Latitude: " + site.latitude + "\n"
+                    + "Longitude: " + site.longitude + "\n"
+                    + "Grade: " + site.grade;
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }else{
+            Toast.makeText(context, "No bathing sites found in the database.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

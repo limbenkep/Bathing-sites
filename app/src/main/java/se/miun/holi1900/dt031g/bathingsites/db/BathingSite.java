@@ -1,7 +1,9 @@
 package se.miun.holi1900.dt031g.bathingsites.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -35,4 +37,30 @@ public class BathingSite {
 
     @ColumnInfo(name = "grade")
     public float grade;
+
+    public BathingSite(){
+        this("","",0, 0);
+    }
+    @Ignore
+    public BathingSite(String siteName, String address, double latitude, double longitude) {
+        this.siteName = siteName;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    @Override
+    @NonNull
+    public String toString() {
+        return "BathingSite{" +
+                ", siteName='" + siteName + '\'' +
+                ", description='" + description + '\'' +
+                ", address='" + address + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", waterTemp=" + waterTemp +
+                ", date='" + date + '\'' +
+                ", grade=" + grade +
+                '}';
+    }
 }

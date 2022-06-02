@@ -17,7 +17,7 @@ public interface BathingSiteDao {
     @Query("SELECT * FROM " + BATHING_SITE_TABLE + " ORDER BY site_name ASC")
     LiveData<List<BathingSite>> getAllBathingSites();
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
      void insertBathingSite(BathingSite... bathingSite);
 
     @Query("SELECT * FROM " + BATHING_SITE_TABLE + " WHERE latitude = :lat AND longitude = :lon LIMIT 1")
