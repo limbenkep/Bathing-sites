@@ -199,11 +199,11 @@ public class AddBathingSiteFragment extends Fragment {
             bathingSite.address = address.getText().toString();
             String lat = latitude.getText().toString();
             if(!lat.isEmpty()){
-                bathingSite.latitude = Integer.parseInt(lat);
+                bathingSite.latitude = Double.parseDouble(lat);
             }
             String lon = longitude.getText().toString();
             if(!lon.isEmpty()){
-                bathingSite.longitude = Integer.parseInt(lon);
+                bathingSite.longitude = Double.parseDouble(lon);
             }
             String tmp = waterTemp.getText().toString();
             if(!tmp.isEmpty()){
@@ -303,7 +303,7 @@ public class AddBathingSiteFragment extends Fragment {
          */
         @Override
         protected void onPreExecute() {
-            progressDialog = new CustomProgressDialogView();
+            progressDialog = new CustomProgressDialogView(getText(R.string.getting_weather));
             progressDialog.show(getChildFragmentManager(), "CustomProgressDialogView");
         }
 

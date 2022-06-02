@@ -20,7 +20,8 @@
             android:textSize="@dimen/add_bathing_site_font_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:labelFor="@+id/nameEntry"/>
 
         <EditText
             android:id="@+id/nameEntry"
@@ -32,7 +33,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nameLabel"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            tools:ignore="DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/descriptionLabel"
@@ -42,7 +43,8 @@
             android:textSize="@dimen/add_bathing_site_font_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nameEntry" />
+            app:layout_constraintTop_toBottomOf="@+id/nameEntry"
+            android:labelFor="@+id/descriptionEntry"/>
 
         <EditText
             android:id="@+id/descriptionEntry"
@@ -54,7 +56,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/descriptionLabel"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            tools:ignore="DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/addressLabel"
@@ -64,7 +66,8 @@
             android:textSize="@dimen/add_bathing_site_font_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionEntry" />
+            app:layout_constraintTop_toBottomOf="@+id/descriptionEntry"
+            android:labelFor="@+id/addressEntry"/>
 
         <EditText
             android:id="@+id/addressEntry"
@@ -76,7 +79,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/addressLabel"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            tools:ignore="DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/latitudeLabel"
@@ -86,20 +89,21 @@
             android:textSize="@dimen/add_bathing_site_font_size"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/addressEntry"
-            app:layout_constraintWidth_percent="@fraction/half_fraction" />
+            app:layout_constraintWidth_percent="@fraction/half_fraction"
+            android:labelFor="@+id/latitudeEntry"/>
 
         <EditText
             android:id="@+id/latitudeEntry"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:importantForAutofill="no"
-            android:inputType="numberSigned"
+            android:inputType="numberSigned|number|numberDecimal"
             android:minHeight="@dimen/add_bathing_site_edit_text_min_height"
             android:textColorHint="#757575"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/latitudeLabel"
             app:layout_constraintWidth_percent="@fraction/half_fraction"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            tools:ignore="DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/longitudeLabel"
@@ -110,7 +114,8 @@
             android:textSize="@dimen/add_bathing_site_font_size"
             app:layout_constraintStart_toEndOf="@+id/latitudeLabel"
             app:layout_constraintTop_toBottomOf="@+id/addressEntry"
-            app:layout_constraintWidth_percent="@fraction/half_fraction" />
+            app:layout_constraintWidth_percent="@fraction/half_fraction"
+            android:labelFor="@+id/longitudeEntry"/>
 
 
         <EditText
@@ -118,7 +123,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:importantForAutofill="no"
-            android:inputType="numberSigned"
+            android:inputType="numberSigned|numberDecimal"
             android:minHeight="@dimen/add_bathing_site_edit_text_min_height"
             android:textColorHint="#757575"
             app:layout_constraintEnd_toEndOf="parent"
@@ -126,7 +131,7 @@
             app:layout_constraintStart_toEndOf="@+id/latitudeEntry"
             app:layout_constraintTop_toBottomOf="@+id/longitudeLabel"
             app:layout_constraintWidth_percent="@fraction/half_fraction"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            tools:ignore="DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/gredeLabel"
@@ -159,7 +164,8 @@
             android:textSize="@dimen/add_bathing_site_font_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/gradeEntry" />
+            app:layout_constraintTop_toBottomOf="@+id/gradeEntry"
+            android:labelFor="@+id/tempEntry"/>
 
         <EditText
             android:id="@+id/tempEntry"
@@ -172,7 +178,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tempLabel"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            tools:ignore="DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/tempDateLabel"
@@ -182,21 +188,22 @@
             android:textSize="@dimen/add_bathing_site_font_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tempEntry" />
+            app:layout_constraintTop_toBottomOf="@+id/tempEntry"
+            android:labelFor="@+id/dateWaterEntry"/>
 
         <EditText
             android:id="@+id/dateWaterEntry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusable="false"
             android:importantForAutofill="no"
             android:inputType="date"
             android:minHeight="@dimen/add_bathing_site_edit_text_min_height"
             android:textColorHint="#757575"
-            android:focusable="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tempDateLabel"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            tools:ignore="DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

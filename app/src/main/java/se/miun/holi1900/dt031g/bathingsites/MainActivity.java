@@ -1,6 +1,10 @@
 package se.miun.holi1900.dt031g.bathingsites;
 
+//import android.app.Application;
+//import android.content.Context;
 import android.content.Intent;
+//import android.net.ConnectivityManager;
+//import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.settings_menu, menu);
+        inflater.inflate(R.menu.menu_download, menu);
         return true;
     }
 
@@ -30,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId()==R.id.settings_option){
             startActivity(new Intent(this, SettingsActivity.class));
+            return  true;
+        }
+        if(item.getItemId()==R.id.download_option){
+            startActivity(new Intent(this, DownloadActivity.class));
             return  true;
         }
         return super.onOptionsItemSelected(item);

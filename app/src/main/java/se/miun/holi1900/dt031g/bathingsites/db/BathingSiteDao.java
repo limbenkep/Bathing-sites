@@ -1,6 +1,6 @@
 package se.miun.holi1900.dt031g.bathingsites.db;
 
-import static se.miun.holi1900.dt031g.bathingsites.utils.Constants.BATHING_SITE_TABLE;
+import static se.miun.holi1900.dt031g.bathingsites.utils.Helper.BATHING_SITE_TABLE;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -21,7 +21,7 @@ public interface BathingSiteDao {
      void insertBathingSite(BathingSite... bathingSite);
 
     @Query("SELECT * FROM " + BATHING_SITE_TABLE + " WHERE latitude = :lat AND longitude = :lon LIMIT 1")
-    BathingSite findByCoordinates(final int lat, final int lon);
+    BathingSite findByCoordinates(final double lat, final double lon);
 
     @Query("SELECT COUNT(*) FROM " + BATHING_SITE_TABLE)
     LiveData<Integer> getRowCount();

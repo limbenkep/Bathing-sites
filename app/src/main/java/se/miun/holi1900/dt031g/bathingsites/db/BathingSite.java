@@ -22,10 +22,10 @@ public class BathingSite {
     public String address;
 
     @ColumnInfo(name = "latitude")
-    public int latitude;
+    public double latitude;
 
     @ColumnInfo(name = "longitude")
-    public int longitude;
+    public double longitude;
 
     @ColumnInfo(name = "water_temp")
     public double waterTemp;
