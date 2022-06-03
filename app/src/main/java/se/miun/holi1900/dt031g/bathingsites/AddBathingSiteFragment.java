@@ -47,6 +47,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSite;
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSitesRepository;
+import se.miun.holi1900.dt031g.bathingsites.utils.Helper;
 
 
 public class AddBathingSiteFragment extends Fragment {
@@ -62,7 +63,6 @@ public class AddBathingSiteFragment extends Fragment {
     EditText waterTemp;
     EditText tempDate;
     Drawable error_icon;
-    final String WEATHER_BASE_URL = "https://dt031g.programvaruteknik.nu/bathingsites/weather.php?";
     final String WEATHER_ICON_URL = "https://openweathermap.org/img/w/";
 
     @Override
@@ -243,15 +243,17 @@ public class AddBathingSiteFragment extends Fragment {
     }
 
     /**
+     * Use the url in the Settings preference to get weather information
      * Get weather information for the location of the new bathing site.
      * if only coordinates or address is entered used the entered location to get weather
      * if both coordinates and address are entered use coordinates for better precision
      * use the location to build a URL upon the WEATHER_BASE_URL and download the weather
      * information from the URL
-     *
      * @return return true if address or coordinates are provided else false
      */
     public boolean showWeather() {
+        //Get url to download weather information from settings
+        final String WEATHER_BASE_URL =Helper.getPreferenceSummary(getString(R.string.fetch_weather_key), requireContext());
         String addressText = address.getText().toString();
         String longitudeText = longitude.getText().toString();
         String latitudeText = latitude.getText().toString();
