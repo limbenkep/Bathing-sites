@@ -27,13 +27,10 @@ public class ShowWeatherDialogFragment extends DialogFragment {
     }
 
     public ShowWeatherDialogFragment(String message, Drawable icon) {
-
         super();
         this.message = message;
         this.weatherIcon = icon;
-        Log.d(TAG, "ShowWeatherDialogFragment: ");
     }
-
 
     @Nullable
     @Override
@@ -60,6 +57,5 @@ public class ShowWeatherDialogFragment extends DialogFragment {
         textView.setText(message);
         Button ok_button = view.findViewById(R.id.ok_button);
         ok_button.setOnClickListener(view1 -> this.dismiss());
-
     }
 }

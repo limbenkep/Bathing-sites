@@ -8,12 +8,9 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
-import se.miun.holi1900.dt031g.bathingsites.CustomProgressDialogView;
-
 public class BathingSitesRepository {
     private static final String TAG = "DatabaseInterface";
     private final BathingSiteDao bathingSiteDao;
-
 
     public BathingSitesRepository(Context context) {
         AppDatabase db = AppDatabase.getDbAInstance(context);
@@ -38,9 +35,9 @@ public class BathingSitesRepository {
     }
 
     /**
-     * Deletes
-     * @param bathingSites
-     * @return
+     * Deletes bathing sites from database
+     * @param bathingSites bathing sites to delete
+     * @return number of bathing sites deleted
      */
     public int deleteBathingSite(BathingSite... bathingSites) {
         return bathingSiteDao.deleteBathingSite(bathingSites);
@@ -79,14 +76,11 @@ public class BathingSitesRepository {
        return bathingSite !=null;
     }
 
-
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
         AppDatabase.destroyInstance();
     }
-
-
 
     private static class InsertBathingSiteAsyncTask extends AsyncTask<BathingSite, Integer, Long> {
         BathingSiteDao bathingSiteDao;

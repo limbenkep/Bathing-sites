@@ -37,6 +37,16 @@ public class BathingSitesFragment extends Fragment implements BathingSitesView.O
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        updateNumberOfBathingSites();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateNumberOfBathingSites();
+    }
+
+    private void updateNumberOfBathingSites() {
         new BathingSitesRepository(requireContext()).numberOfBathingSites().observe(getViewLifecycleOwner(), integer -> {
             Log.d(TAG, "onChanged: "+integer);
             bathingSitesView.setCounter(integer);

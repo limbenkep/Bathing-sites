@@ -1,10 +1,6 @@
 package se.miun.holi1900.dt031g.bathingsites;
 
-//import android.app.Application;
-//import android.content.Context;
 import android.content.Intent;
-//import android.net.ConnectivityManager;
-//import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;

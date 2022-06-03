@@ -1,12 +1,10 @@
 package se.miun.holi1900.dt031g.bathingsites;
 
-import android.Manifest;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSite;
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSitesRepository;
@@ -46,13 +43,12 @@ public class DownloadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_download);
         webView = findViewById(R.id.bathing_sites_webview);
         //get link to download bathing sites from settings stored in sharedpreference
-        String downloadLink = Helper.getPreferenceSummary(getString(R.string.bathing_site_key), getApplicationContext());
+        String downloadLink = Helper.getPreferenceSummary(getString(R.string.bathing_site_key), getString(R.string.download_bathing_site_url), getApplicationContext());
         webView.loadUrl(downloadLink);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         CustomProgressDialogView progressDialog = new CustomProgressDialogView("Loading...");
-
         progressDialog.show(getSupportFragmentManager(), "CustomProgressDialogView");
-        // Our WebView should handle URL loading instead of the default handler of URL's
+        //WebView should handle URL loading instead of the default handler of URL's
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -203,43 +199,26 @@ public class DownloadActivity extends AppCompatActivity {
                 File file = new File(
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                         Helper.BATHING_SITES_FILE);
-                Log.d(TAG, "doInBackground: file exist: " + (file.exists()));
-                Log.d(TAG, "doInBackground: filepath "+file.getAbsolutePath());
-
                 if(file.exists()){
                     buffer = new BufferedReader(
                             new InputStreamReader(new FileInputStream(file.getAbsoluteFile()), StandardCharsets.UTF_8));
-                    //buffer.lines().forEach(System.out::println);
                     while (!isCancelled() && (inputLine = buffer.readLine()) != null) {
-                        Log.d(TAG, "doInBackground: read data length "+ inputLine.length());
-                        String[] splits = inputLine.split(",");
-                        Log.d(TAG, "doInBackground: splits to array "+ Arrays.toString(splits) + (splits.length) +
-                                ", 0 " + splits[0] + ", 1 " + splits[1] +" 2, " + splits[2]);
+                        String[] splits = inputLine.replaceAll("\\p{C}", "").split(",");
                         String longStr= splits[0].replaceAll("\"", "").trim();
                         String latStr= splits[1].replaceAll("\"", "").trim();
-                        Log.d(TAG, "doInBackground: string vals: longStr=["+longStr+"], latStr=["+latStr+"]");
                         double longitude =-1;
                         double latitude = -1;
                         try {
-
-                        //NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
                             longitude =Double.parseDouble(longStr.replaceAll("\"", "").trim());
-
                             latitude = Double.parseDouble(latStr.replaceAll("\"", "").trim());
-                            Log.d(TAG, "doInBackground: double vals: long=["+longitude+"], lat=["+latitude+"]");
-
                         }catch (Exception e){
                             Log.e(TAG, "doInBackground: " ,e);
                         }
                         String name = splits[2].replaceAll("\"", "").trim();
-
-
-                        Log.d(TAG, "doInBackground: after taking stuff name="+name);
                         String address = "";
                         int splitsLength = splits.length;
                         if(splitsLength ==4){
                             address = splits[3].replaceAll("\"", "").trim();
-                            Log.d(TAG, "doInBackground: getting address");
                         }
                         if ( splitsLength > 4) {
                             StringBuilder sb = new StringBuilder();
@@ -250,27 +229,24 @@ public class DownloadActivity extends AppCompatActivity {
                             }
                             address = sb.toString();
                         }
-
                         if(latitude != -1 && longitude != -1){
                             BathingSite bathingSite = new BathingSite(name, address, latitude, longitude);
-                            bathingSite.address = address.toString();
+                            bathingSite.address = address;
                             bathingSites.add(bathingSite);
-                            Log.d(TAG, "doInBackground: bathing site added "+ bathingSite);
                         }
                     }
                     if (deleteFile()) {
                         new Handler(Looper.getMainLooper())
-                                .post(()->Toast.makeText(
-                                        DownloadActivity.this,
-                                        file.getName() + " Deleted",
-                                        Toast.LENGTH_SHORT).show());
+                                .post(()->Toast.makeText(DownloadActivity.this,
+                                        file.getName() + " Deleted", Toast.LENGTH_SHORT).show());
                     }
                     buffer.close();
                 }else {
+                    Toast.makeText(getApplicationContext(), "Downloaded bathing sites file not found.", Toast.LENGTH_SHORT).show();
                     Log.i(TAG, "doInBackground: No file to read.");
                 }
             } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
+                Log.e(TAG, "doInBackground", e);
             }
             return bathingSites;
         }
@@ -282,9 +258,7 @@ public class DownloadActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final ArrayList<BathingSite> bathingSites) {
             super.onPostExecute(bathingSites);
-            String text =
-                    "File reading completed. " + bathingSites.size() + " bathing " + "sites read.";
-
+            String text = "File reading completed. " + bathingSites.size() + " bathing " + "sites read.";
             Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
             progressDialog.dismiss();
         }
@@ -301,7 +275,6 @@ public class DownloadActivity extends AppCompatActivity {
             if (fileDir.isDirectory()) {
                 File[] filesList = fileDir.listFiles();
                 for (File file : filesList) {
-                    Log.d(TAG, "deleteFile: "+file.getName());
                     if (file.getName().startsWith("bathingSitesFile")) {
                         fileDeleted = file.delete();
                     }
@@ -321,10 +294,8 @@ public class DownloadActivity extends AppCompatActivity {
         try {
             ArrayList<BathingSite> bathingSites = readFile.get();
             if (!bathingSites.isEmpty()) {
-
                 BathingSitesRepository repository =
                         new BathingSitesRepository(getApplicationContext());
-
                 for (BathingSite bathingSite : bathingSites) {
                     repository.insertNewBathingSite(bathingSite);
                 }

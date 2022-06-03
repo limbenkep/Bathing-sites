@@ -74,7 +74,6 @@ public class AddBathingSiteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_bathing_site, container, false);
     }
 
@@ -155,6 +154,7 @@ public class AddBathingSiteFragment extends Fragment {
         String addressText = address.getText().toString();
         String longitudeText = longitude.getText().toString();
         String latitudeText = latitude.getText().toString();
+        String notificationMsg = "Required field";
 
         //If name and address are entered, the entries are valid
         if (!nameText.equals("") && !addressText.equals("")) {
@@ -168,19 +168,19 @@ public class AddBathingSiteFragment extends Fragment {
         //Drawable error_icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_info_24);
         //if the name field is empty, display error icon and message
         if (nameText.equals("")) {
-            name.setError(getString(R.string.name), error_icon);
+            name.setError(notificationMsg, error_icon);
         }
         //if the address field is empty, display error icon and message
         if (addressText.equals("")) {
-            address.setError(getString(R.string.address), error_icon);
+            address.setError(notificationMsg, error_icon);
         }
         //if the latitude field is empty, display error icon and message
         if (latitudeText.equals("")) {
-            latitude.setError(getString(R.string.latitude), error_icon);
+            latitude.setError(notificationMsg, error_icon);
         }
         //if the longitude field is empty, display error icon and message
         if (longitudeText.equals("")) {
-            longitude.setError(getString(R.string.longitude), error_icon);
+            longitude.setError(notificationMsg, error_icon);
         }
         return false;
     }
@@ -253,7 +253,7 @@ public class AddBathingSiteFragment extends Fragment {
      */
     public boolean showWeather() {
         //Get url to download weather information from settings
-        final String WEATHER_BASE_URL =Helper.getPreferenceSummary(getString(R.string.fetch_weather_key), requireContext());
+        final String WEATHER_BASE_URL =Helper.getPreferenceSummary(getString(R.string.fetch_weather_key),getString(R.string.fetch_weather_settings_default_summary), requireContext());
         String addressText = address.getText().toString();
         String longitudeText = longitude.getText().toString();
         String latitudeText = latitude.getText().toString();
@@ -403,7 +403,6 @@ public class AddBathingSiteFragment extends Fragment {
             try {
                 connection = (HttpsURLConnection) url.openConnection();
                 connection.connect();
-
                 InputStream input = connection.getInputStream();
                 return BitmapFactory.decodeStream(input);
             } catch (IOException e) {
