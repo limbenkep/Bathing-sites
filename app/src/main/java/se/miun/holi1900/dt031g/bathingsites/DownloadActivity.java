@@ -2,7 +2,6 @@ package se.miun.holi1900.dt031g.bathingsites;
 
 import android.Manifest;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
@@ -29,15 +27,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Scanner;
 
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSite;
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSitesRepository;
@@ -45,12 +38,12 @@ import se.miun.holi1900.dt031g.bathingsites.utils.Helper;
 
 public class DownloadActivity extends AppCompatActivity {
     BroadcastReceiver receiver;
+    WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
-
         //Runtime External storage permission for saving download files
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_DENIED) {
@@ -58,11 +51,10 @@ public class DownloadActivity extends AppCompatActivity {
             String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
             requestPermissions(permissions, 1);
         }
-
-
-
-        WebView webView = findViewById(R.id.bathing_sites_webview);
-        webView.loadUrl(Helper.BATHING_SITES_DOWNLOAD_LINK);
+        webView = findViewById(R.id.bathing_sites_webview);
+        //get link to download bathing sites from settings stored in sharedpreference
+        String downloadLink = Helper.getPreferenceSummary(getString(R.string.bathing_site_key), getApplicationContext());
+        webView.loadUrl(downloadLink);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         CustomProgressDialogView progressDialog = new CustomProgressDialogView("Loading...");
 
@@ -79,7 +71,10 @@ public class DownloadActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
         });
+        downloadBathingSitesFile();
+    }
 
+    private void downloadBathingSitesFile(){
         //handle downloading
         webView.setDownloadListener(new DownloadListener()
         {
@@ -111,7 +106,6 @@ public class DownloadActivity extends AppCompatActivity {
                                     Environment.DIRECTORY_DOWNLOADS, Helper.BATHING_SITES_FILE);
                             DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                             dm.enqueue(request);
-
                         }
                         else{
 
@@ -128,7 +122,7 @@ public class DownloadActivity extends AppCompatActivity {
                                 if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
                                     dialog.dismiss();
                                     Toast.makeText(context, "Download completed", Toast.LENGTH_SHORT).show();
-                                    processFile();
+                                    saveDownloadedBathingSitesToDatabase();
                                 }
                             }
                         };
@@ -139,6 +133,7 @@ public class DownloadActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     public void onBackPressed(){
         WebView wv = (WebView)findViewById(R.id.bathing_sites_webview);
@@ -154,7 +149,6 @@ public class DownloadActivity extends AppCompatActivity {
      */
     private void destroyReceiver() {
         if (receiver != null) {
-
             unregisterReceiver(receiver);
         }
     }
@@ -177,8 +171,11 @@ public class DownloadActivity extends AppCompatActivity {
         destroyReceiver();
     }
 
-
-
+    /**
+     * Async task to read bathing sites from file.
+     * Reads bathing sites from downloaded file,
+     * and return a list of bathing sites
+     */
     private class ReadBathingSitesFromFileAsyncTask extends AsyncTask<Void, Void, ArrayList<BathingSite>> {
         private static final String TAG = "ReadBathingSitesFromFil";
         private ArrayList<BathingSite> bathingSites;
@@ -190,12 +187,21 @@ public class DownloadActivity extends AppCompatActivity {
         }
 
 
+        /**
+         * starts progress dialog
+         */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             progressDialog = new CustomProgressDialogView("Reading bathing sites from file.");
             progressDialog.show(getSupportFragmentManager(), "CustomProgressDialogView");
         }
+
+        /**
+         * Reads file, parse data and create BathingSite objects
+         * @param voids no parameter
+         * @return list os BathingSite
+         */
         @Override
         protected ArrayList<BathingSite> doInBackground(final Void... voids) {
             BufferedReader buffer;
@@ -276,6 +282,10 @@ public class DownloadActivity extends AppCompatActivity {
             return bathingSites;
         }
 
+        /**
+         * Dismiss progress dialog and display message with that download is completed
+         * @param bathingSites list of BathingSites
+         */
         @Override
         protected void onPostExecute(final ArrayList<BathingSite> bathingSites) {
             super.onPostExecute(bathingSites);
@@ -286,6 +296,10 @@ public class DownloadActivity extends AppCompatActivity {
             progressDialog.dismiss();
         }
 
+        /**
+         * deletes files in download directory that starts with "downloadedSite"
+         * @return
+         */
         public boolean deleteFile() {
             String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                     .toString();
@@ -295,7 +309,7 @@ public class DownloadActivity extends AppCompatActivity {
                 File[] filesList = fileDir.listFiles();
                 for (File file : filesList) {
                     Log.d(TAG, "deleteFile: "+file.getName());
-                    if (file.getName().startsWith("downloadedSite")) {
+                    if (file.getName().startsWith("bathingSitesFile")) {
                         fileDeleted = file.delete();
                     }
                 }
@@ -304,11 +318,13 @@ public class DownloadActivity extends AppCompatActivity {
         }
     }
 
-    private void processFile() {
+    /**
+     * Reads bathing sites from downloaded file in Download directory and save the bathing sites to the database
+     */
+    private void saveDownloadedBathingSitesToDatabase() {
         ReadBathingSitesFromFileAsyncTask readFile = new ReadBathingSitesFromFileAsyncTask();
         Toast.makeText(DownloadActivity.this, "Reading file contents...", Toast.LENGTH_LONG).show();
         readFile.execute();
-
         try {
             ArrayList<BathingSite> bathingSites = readFile.get();
             if (!bathingSites.isEmpty()) {
@@ -319,12 +335,7 @@ public class DownloadActivity extends AppCompatActivity {
                 for (BathingSite bathingSite : bathingSites) {
                     repository.insertNewBathingSite(bathingSite);
                 }
-                /*Globals.addToPreference(Globals.BATHING_SITES,
-                        Integer.toString(repository.numberOfBathingSites()), getApplicationContext());
-
-                Globals.toastLong(getApplicationContext(), "Saving of bathing sites completed");*/
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
