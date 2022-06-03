@@ -10,4 +10,9 @@
         app:defaultValue="@string/download_bathing_site_url"
         app:summary="@string/download_bathing_site_url"
         app:title="@string/new_bathing_site_option_header"/>
+    <EditTextPreference
+        app:key="@string/radius_key"
+        app:defaultValue="@string/radius_default_value"
+        app:summary="@string/radius_default_value"
+        app:title="@string/radius_title"/>
 </PreferenceScreen>

@@ -5,7 +5,6 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -18,11 +17,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BathingSites"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyChCTxjAz2NWkfAKqIpzDkY38EP5XoTVLA" />
+
+        <activity
+            android:name=".MapsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_maps" />
         <activity
             android:name=".DownloadActivity"
             android:parentActivityName=".MainActivity">
 
-        <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

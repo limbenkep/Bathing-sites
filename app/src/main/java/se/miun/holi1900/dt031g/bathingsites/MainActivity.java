@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.settings_menu, menu);
         inflater.inflate(R.menu.menu_download, menu);
+        inflater.inflate(R.menu.menu_map, menu);
         return true;
     }
 
@@ -35,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
         }
         if(item.getItemId()==R.id.download_option){
             startActivity(new Intent(this, DownloadActivity.class));
+            return  true;
+        }
+        if(item.getItemId()==R.id.map_option){
+            startActivity(new Intent(this, MapsActivity.class));
             return  true;
         }
         return super.onOptionsItemSelected(item);
