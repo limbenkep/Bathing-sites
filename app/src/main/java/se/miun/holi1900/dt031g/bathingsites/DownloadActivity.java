@@ -44,13 +44,6 @@ public class DownloadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
-        //Runtime External storage permission for saving download files
-       /* if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_DENIED) {
-            Log.d("permission", "permission denied to WRITE_EXTERNAL_STORAGE - requesting it");
-            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-            requestPermissions(permissions, 1);
-        }*/
         webView = findViewById(R.id.bathing_sites_webview);
         //get link to download bathing sites from settings stored in sharedpreference
         String downloadLink = Helper.getPreferenceSummary(getString(R.string.bathing_site_key), getApplicationContext());
