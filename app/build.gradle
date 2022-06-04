@@ -35,6 +35,9 @@ android {
 dependencies {
     implementation 'androidx.room:room-common:2.4.2'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
+    implementation 'com.google.android.gms:play-services-nearby:18.2.0'
+    implementation 'com.google.android.gms:play-services-base:18.0.1'
     def room_version = "2.4.2"
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.6.0'
