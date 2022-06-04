@@ -253,7 +253,8 @@ public class AddBathingSiteFragment extends Fragment {
      */
     public boolean showWeather() {
         //Get url to download weather information from settings
-        final String WEATHER_BASE_URL =Helper.getPreferenceSummary(getString(R.string.fetch_weather_key), requireContext());
+        final String WEATHER_BASE_URL =Helper.getPreferenceSummary(getString(R.string.fetch_weather_key),
+                getString(R.string.fetch_weather_settings_default_summary) ,requireContext());
         String addressText = address.getText().toString();
         String longitudeText = longitude.getText().toString();
         String latitudeText = latitude.getText().toString();

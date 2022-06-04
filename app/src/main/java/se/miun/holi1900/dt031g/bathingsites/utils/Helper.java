@@ -15,8 +15,8 @@ public class Helper {
     public static final String BATHING_SITES_FILE = "bathingSitesFile.csv";
     public static final CharSequence DOWNLOAD_PROGRESS_DIALOG_MESSAGE = "Downloading bathing sites";
 
-    public static String getPreferenceSummary(String key, Context context) {
+    public static String getPreferenceSummary(String key, String defaultValue, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString(key, "");
+        return preferences.getString(key, defaultValue);
     }
 }

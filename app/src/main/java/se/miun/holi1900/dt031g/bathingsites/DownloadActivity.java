@@ -45,8 +45,10 @@ public class DownloadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
         webView = findViewById(R.id.bathing_sites_webview);
+
         //get link to download bathing sites from settings stored in sharedpreference
-        String downloadLink = Helper.getPreferenceSummary(getString(R.string.bathing_site_key), getApplicationContext());
+        String downloadLink = Helper.getPreferenceSummary(getString(R.string.bathing_site_key),
+                getString(R.string.download_bathing_site_url), getApplicationContext());
         webView.loadUrl(downloadLink);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         CustomProgressDialogView progressDialog = new CustomProgressDialogView("Loading...");
@@ -212,7 +214,7 @@ public class DownloadActivity extends AppCompatActivity {
                     //buffer.lines().forEach(System.out::println);
                     while (!isCancelled() && (inputLine = buffer.readLine()) != null) {
                         Log.d(TAG, "doInBackground: read data length "+ inputLine.length());
-                        String[] splits = inputLine.split(",");
+                        String[] splits = inputLine.replaceAll("\\p{C}", "").split(",");
                         Log.d(TAG, "doInBackground: splits to array "+ Arrays.toString(splits) + (splits.length) +
                                 ", 0 " + splits[0] + ", 1 " + splits[1] +" 2, " + splits[2]);
                         String longStr= splits[0].replaceAll("\"", "").trim();
