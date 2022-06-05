@@ -1,10 +1,12 @@
 package se.miun.holi1900.dt031g.bathingsites;
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,14 +36,37 @@ import se.miun.holi1900.dt031g.bathingsites.db.BathingSite;
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSitesRepository;
 import se.miun.holi1900.dt031g.bathingsites.utils.Helper;
 
+/**
+ * This class uses a webview to load a website from which csv files containing bathing sites can be
+ * downloaded. The Url for the website is gotten from Settings preferences.
+ * This class is responsible for loading the website, downloads the file when clicked and
+ * read the bathing sites from the downloaded file and sove them in the database.
+ */
 public class DownloadActivity extends AppCompatActivity {
-    BroadcastReceiver receiver;
-    WebView webView;
+    private BroadcastReceiver receiver;
+    private WebView webView;
 
+    /**
+     * Sets layout, sets webview to handle URL loading instead of the default handler of URL's
+     * gets url to website from which bathing sites will be downloaded
+     * sets a download listener to the webView
+     * @param savedInstanceState A mapping from String keys to various Parcelable values.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
+        // Requesting Permission to access External Storage
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 33);
+        }
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 77);
+        }
         webView = findViewById(R.id.bathing_sites_webview);
         //get link to download bathing sites from settings stored in sharedpreference
         String downloadLink = Helper.getPreferenceSummary(getString(R.string.bathing_site_key), getString(R.string.download_bathing_site_url), getApplicationContext());
@@ -63,6 +89,12 @@ public class DownloadActivity extends AppCompatActivity {
         downloadBathingSitesFile();
     }
 
+    /**
+     * Sets a download listener to the webView
+     * Downloads file asynchronously, name file and save in download folder.
+     * Registers a BroadCastReceiver  to send notification when download is completed.
+     * Displays a progress dialog during download
+     */
     private void downloadBathingSitesFile(){
         //handle downloading
         webView.setDownloadListener(new DownloadListener()
@@ -125,7 +157,7 @@ public class DownloadActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        WebView wv = (WebView)findViewById(R.id.bathing_sites_webview);
+        WebView wv = findViewById(R.id.bathing_sites_webview);
         if(wv.canGoBack()){
             wv.goBack();
         } else {
@@ -142,18 +174,27 @@ public class DownloadActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * overrides onResume method and add code to unregister BroadCastReceiver
+     */
     @Override
     protected void onResume() {
         super.onResume();
         destroyReceiver();
     }
 
+    /**
+     * overrides onRestart method and add code to unregister BroadCastReceiver
+     */
     @Override
     protected void onRestart() {
         super.onRestart();
         destroyReceiver();
     }
 
+    /**
+     * overrides onDestroy method and add code to unregister BroadCastReceiver
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -265,7 +306,7 @@ public class DownloadActivity extends AppCompatActivity {
 
         /**
          * deletes files in download directory that starts with "downloadedSite"
-         * @return
+         * @return true is file is deleted else false
          */
         public boolean deleteFile() {
             String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)

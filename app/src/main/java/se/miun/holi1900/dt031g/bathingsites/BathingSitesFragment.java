@@ -19,11 +19,23 @@ import java.util.Random;
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSite;
 import se.miun.holi1900.dt031g.bathingsites.db.BathingSitesRepository;
 
-
+/**
+ * The fragment contain a BathingSiteView and
+ * defines the behavior when the BathingSiteView is clicked
+ */
 public class BathingSitesFragment extends Fragment implements BathingSitesView.OnClickedListener {
     private BathingSitesView bathingSitesView;
     private static final String TAG = "BathingSitesFragment";
 
+    /**
+     * On create, the View is inflated with the view,s layout and
+     * a listener is set for the bathing site view component.
+     * @param inflater inflates view with it's layout
+     * @param container base of the layout and defines ViewGroup.LayoutParams which serve as
+     *                  base for class layout parameters
+     * @param savedInstanceState A mapping from String keys to various Parcelable values.
+     * @return inflated view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -34,18 +46,30 @@ public class BathingSitesFragment extends Fragment implements BathingSitesView.O
         return view;
     }
 
+    /**
+     * updates number od bathing sites displayed on the BathingSiteView when view is created
+     * @param view view
+     * @param savedInstanceState A mapping from String keys to various Parcelable values.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateNumberOfBathingSites();
     }
 
+    /**
+     * updates number od bathing sites displayed on the BathingSiteView when view is resumed
+     */
     @Override
     public void onResume() {
         super.onResume();
         updateNumberOfBathingSites();
     }
 
+    /**
+     * Get number of bathing sites stored in the database and sets is as the number of bathing
+     * sites displayed on the BathingSiteView
+     */
     private void updateNumberOfBathingSites() {
         new BathingSitesRepository(requireContext()).numberOfBathingSites().observe(getViewLifecycleOwner(), integer -> {
             Log.d(TAG, "onChanged: "+integer);
@@ -53,12 +77,22 @@ public class BathingSitesFragment extends Fragment implements BathingSitesView.O
         });
     }
 
+    /**
+     * Overrides onClick method for the BathingSiteView custom OnClickedListener.
+     * Displays a random bathing site from the database whenever the BathingSiteView in
+     * this fragment is clicked
+     * @param dialButtonView dialButtonView that is clicked
+     */
     @Override
     public void onClick(BathingSitesView dialButtonView) {
         new BathingSitesRepository(requireContext()).getAllBathingSites()
                 .observe(getViewLifecycleOwner(), this::displayRandomBathingSite);
     }
 
+    /**
+     * Selects a random bathing site and displays information about the bathing site in a Toast
+     * @param list list of BathingSite objects
+     */
     private void displayRandomBathingSite(List<BathingSite> list){
         Context context = requireContext();
         if(list.size() !=0){

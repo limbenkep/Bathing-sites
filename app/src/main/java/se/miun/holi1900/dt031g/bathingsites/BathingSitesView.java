@@ -13,7 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class BathingSitesView extends ConstraintLayout implements View.OnClickListener {
     private static final String TAG = "BathingSitesView";
-    TextView textView; // textview that display text with number of bathing sites
+    private TextView textView; // textview that display text with number of bathing sites
     int counter = 0;// number of bathing sites
 
     /**

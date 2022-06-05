@@ -82,6 +82,9 @@ public class BathingSitesRepository {
         AppDatabase.destroyInstance();
     }
 
+    /**
+     * Async task to add bathing site to database
+     */
     private static class InsertBathingSiteAsyncTask extends AsyncTask<BathingSite, Integer, Long> {
         BathingSiteDao bathingSiteDao;
 
@@ -96,6 +99,9 @@ public class BathingSitesRepository {
         }
     }
 
+    /**
+     * Async Task to delete bathing sites from database.
+     */
     private static class DeleteBathingSiteAsyncTask extends AsyncTask<BathingSite, Integer, Integer> {
         BathingSiteDao bathingSiteDao;
 

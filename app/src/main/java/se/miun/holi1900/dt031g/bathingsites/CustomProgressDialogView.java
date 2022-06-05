@@ -16,7 +16,7 @@ import androidx.fragment.app.DialogFragment;
  * through he constructor
  */
 public class CustomProgressDialogView extends DialogFragment {
-    CharSequence  text;
+    private final CharSequence  text;
     CustomProgressDialogView(CharSequence message){
         this.text = message;
     }

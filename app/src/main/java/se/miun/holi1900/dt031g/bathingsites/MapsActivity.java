@@ -97,6 +97,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * request location permission
+     */
     private void requestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -107,19 +110,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             new AlertDialog.Builder(this)
                     .setTitle("Location Permission Needed")
                     .setMessage("This app needs the Location permission, please accept to use location functionality")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            //Prompt the user once explanation has been shown
-                            ActivityCompat.requestPermissions(MapsActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    MY_PERMISSIONS_REQUEST_LOCATION );
-                        }
+                    .setPositiveButton("OK", (dialogInterface, i) -> {
+                        //Prompt the user once explanation has been shown
+                        ActivityCompat.requestPermissions(MapsActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                MY_PERMISSIONS_REQUEST_LOCATION );
                     })
                     .create()
                     .show();
-
-
         } else {
             // No explanation needed, we can request the permission.
             ActivityCompat.requestPermissions(this,
@@ -128,12 +126,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * onRequestPermissionsResult, if request location permission is granted, get device location
+     * and mark all bathing sites within the given radius from the device location
+     * @param requestCode requwst code
+     * @param permissions permission results
+     * @param grantResults grantsresult
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == MY_PERMISSIONS_REQUEST_LOCATION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getDeviceLocation();
-                markBathingSitesOnMap(getBathingSites());
+                displayBathingSitesOnMap();
                 Toast.makeText(this, "permission granted", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
@@ -143,23 +148,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Get current location of the device and mark it on the map and move camera to the location
+     */
    private void getDeviceLocation() {
         if(ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
             mMap.setMyLocationEnabled(true);
-            fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    Log.d(TAG, "onSuccess: ");
-                    if(location != null){
-                        Log.d(TAG, "onSuccess: lat " + location.getLatitude());
-                        deviceLocation = new Location(location);
-                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).title("Current device location."));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
-                        markBathingSitesOnMap(getBathingSites());
-                    }
+            fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                Log.d(TAG, "onSuccess: ");
+                if(location != null){
+                    Log.d(TAG, "onSuccess: my location latitude: " + location.getLatitude()
+                            + " longitude: " + location.getLongitude());
+                    deviceLocation = new Location(location);
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("Current device location."));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+                    displayBathingSitesOnMap();
                 }
             });
         }else{
@@ -167,63 +173,58 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Get the radius within which bathing sites should be displayed on the map
+     * @return radius
+     */
     private double getSearchRadius(){
         String radiusText = Helper.getPreferenceSummary(getString(R.string.radius_key),
                 getString(R.string.radius_default_value), getApplicationContext());
-        String[] splits = radiusText.toUpperCase().split("K");
-
         try {
-            return Double.parseDouble(splits[0].trim());
+            return Double.parseDouble(radiusText);
         }catch(Exception e){
             Toast.makeText(this, "Search radius format is wrong.", Toast.LENGTH_LONG).show();
             return 0;
         }
     }
 
+    /**
+     * checks if the distance from device location to the passed bathing site is less that or equal
+     * to the radius within which bathing site should be displayed provided in the setting.
+     * @param site bathing site
+     * @return true if bathing site is within the radius else false.
+     */
     private boolean isBathingSiteWithinSearchRange(BathingSite site){
+        Location bathingSite = new Location("");
+        bathingSite.setLatitude(site.latitude);
+        bathingSite.setLongitude(site.longitude);
         double radius = getSearchRadius();
-        double deviceLat = deviceLocation.getLatitude();
-        double deviceLon = deviceLocation.getLongitude();
-        double latitudeUpperRange = deviceLat + radius;
-        double longitudeUpperRange = deviceLon + radius;
-        double latitudeLowerRange = deviceLat - radius;
-        double longitudeLowerRange = deviceLon - radius;
-        double siteLat = site.latitude;
-        double siteLon = site.longitude;
-        return (siteLat >= latitudeLowerRange) && (siteLat <= latitudeUpperRange)
-                && (siteLon >= longitudeLowerRange) && (siteLon <= longitudeUpperRange);
+        double distance = (deviceLocation.distanceTo(bathingSite))/1000;
+        return distance<=radius;
     }
 
-    private ArrayList<BathingSite> getBathingSites(){
-        ArrayList<BathingSite> selected = new ArrayList<>();
+    /**
+     * display the bathing sites within the given radius on the map.
+     */
+    private void displayBathingSitesOnMap(){
         new BathingSitesRepository(this).getAllBathingSites()
-                .observe(this, new Observer<List<BathingSite>>() {
-                    @Override
-                    public void onChanged(List<BathingSite> sites) {
-                        Log.d(TAG, "onChanged: List size = " + (sites.size()));
-                        if(sites.size() != 0){
-                            for(int i=0; i<sites.size(); i++){
-                                BathingSite bathingSite = sites.get(i);
-                                if(isBathingSiteWithinSearchRange(bathingSite)){
-                                    selected.add(bathingSite);
-                                }
+                .observe(this, sites -> {
+                    Log.d(TAG, "onChanged: List size = " + (sites.size()));
+                    if(sites.size() != 0){
+                        for(int i=0; i<sites.size(); i++){
+                            BathingSite bathingSite = sites.get(i);
+                            if(isBathingSiteWithinSearchRange(bathingSite)){
+                                LatLng latLng = new LatLng(bathingSite.latitude, bathingSite.longitude);
+                                mMap.addMarker(new MarkerOptions().position(latLng).title(bathingSite.siteName));
                             }
-                        }else{
-                            Toast.makeText(getApplicationContext(), "No bathing sites found in the database.", Toast.LENGTH_LONG).show();
                         }
+                    }else{
+                        Toast.makeText(getApplicationContext(), "No bathing sites found in the database.", Toast.LENGTH_LONG).show();
                     }
                 });
-        return selected;
     }
 
-    private void markBathingSitesOnMap(ArrayList<BathingSite>sites){
-        if(sites != null && sites.size()>0){
-            for(int i=0; i<sites.size(); i++){
-                BathingSite site = sites.get(i);
-                LatLng latLng = new LatLng(site.latitude, site.longitude);
-                mMap.addMarker(new MarkerOptions().position(latLng).title(site.siteName));
-            }
-        }
-    }
+
+
 
 }

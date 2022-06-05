@@ -14,5 +14,6 @@
         app:key="@string/radius_key"
         app:defaultValue="@string/radius_default_value"
         app:summary="@string/radius_default_value"
-        app:title="@string/radius_title"/>
+        app:title="@string/radius_title"
+        app:useSimpleSummaryProvider="false"/>
 </PreferenceScreen>

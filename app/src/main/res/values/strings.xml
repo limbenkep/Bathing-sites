@@ -45,7 +45,7 @@
     <string name="download">Download</string>
     <string name="set_weather_url">Enter new url for weather information</string>
     <string name="set_new_bathing_sites_download_url">Enter new  url to download bathing site</string>
-    <string name="radius_default_value">50 km</string>
+    <string name="radius_default_value">50</string>
 
     <!-- Preference Titles -->
     <string name="radius_title">Bathing sites search radius from current position in km</string>
