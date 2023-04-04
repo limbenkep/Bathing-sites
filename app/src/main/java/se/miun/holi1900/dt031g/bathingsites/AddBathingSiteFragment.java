@@ -1,6 +1,6 @@
 package se.miun.holi1900.dt031g.bathingsites;
 
-import android.content.Context;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RatingBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -39,14 +38,22 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import se.miun.holi1900.dt031g.bathingsites.db.BathingSite;
+import se.miun.holi1900.dt031g.bathingsites.db.BathingSitesRepository;
+import se.miun.holi1900.dt031g.bathingsites.utils.Helper;
 
 
 public class AddBathingSiteFragment extends Fragment {
     final String TAG = "AddBathingSiteFragment";
     public static final String READ_FILE_ERROR = "Error reading Weather";
+    final Calendar myCalendar= Calendar.getInstance();
     EditText name;
     EditText description;
     EditText address;
@@ -56,7 +63,6 @@ public class AddBathingSiteFragment extends Fragment {
     EditText waterTemp;
     EditText tempDate;
     Drawable error_icon;
-    final String WEATHER_BASE_URL = "https://dt031g.programvaruteknik.nu/bathingsites/weather.php?";
     final String WEATHER_ICON_URL = "https://openweathermap.org/img/w/";
 
     @Override
@@ -68,7 +74,6 @@ public class AddBathingSiteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_bathing_site, container, false);
     }
 
@@ -82,7 +87,8 @@ public class AddBathingSiteFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.save_form_option) {
-            return saveEnteredInformation();
+            saveEnteredInformation();
+            return true;
         }
         if (item.getItemId() == R.id.delete_form_option) {
             clearEntryFields();
@@ -112,11 +118,29 @@ public class AddBathingSiteFragment extends Fragment {
         grade = view.findViewById(R.id.gradeEntry);
         waterTemp = view.findViewById(R.id.tempEntry);
         tempDate = view.findViewById(R.id.dateWaterEntry);
-
         error_icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_info_24);
         if (error_icon != null) {
             error_icon.setBounds(0, 0, error_icon.getIntrinsicWidth(), error_icon.getIntrinsicHeight());
         }
+
+        DatePickerDialog.OnDateSetListener date = (view1, year, month, day) -> {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH,month);
+            myCalendar.set(Calendar.DAY_OF_MONTH,day);
+            setDateWaterTemp();
+        };
+        tempDate.setOnClickListener(view12 -> new DatePickerDialog(requireContext(),date,myCalendar.get(Calendar.YEAR),myCalendar
+                .get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show());
+    }
+
+    /**
+     * sets the value of the date water temperature field
+     */
+
+    private void setDateWaterTemp(){
+        String myFormat="MM/dd/yy";
+        SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.US);
+        tempDate.setText(dateFormat.format(myCalendar.getTime()));
     }
 
     /**
@@ -130,6 +154,7 @@ public class AddBathingSiteFragment extends Fragment {
         String addressText = address.getText().toString();
         String longitudeText = longitude.getText().toString();
         String latitudeText = latitude.getText().toString();
+        String notificationMsg = "Required field";
 
         //If name and address are entered, the entries are valid
         if (!nameText.equals("") && !addressText.equals("")) {
@@ -143,40 +168,64 @@ public class AddBathingSiteFragment extends Fragment {
         //Drawable error_icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_info_24);
         //if the name field is empty, display error icon and message
         if (nameText.equals("")) {
-            name.setError(getString(R.string.name), error_icon);
+            name.setError(notificationMsg, error_icon);
         }
         //if the address field is empty, display error icon and message
         if (addressText.equals("")) {
-            address.setError(getString(R.string.address), error_icon);
+            address.setError(notificationMsg, error_icon);
         }
         //if the latitude field is empty, display error icon and message
         if (latitudeText.equals("")) {
-            latitude.setError(getString(R.string.latitude), error_icon);
+            latitude.setError(notificationMsg, error_icon);
         }
         //if the longitude field is empty, display error icon and message
         if (longitudeText.equals("")) {
-            longitude.setError(getString(R.string.longitude), error_icon);
+            longitude.setError(notificationMsg, error_icon);
         }
         return false;
     }
 
-    public boolean saveEnteredInformation() {
+    /**
+     * saves new bathing site to Room database and return to MainActivity.
+     * If any of the obligatory fields are not provided, the bathing sites is not saved
+     * If bathing site with the same latitude and longitude as the new bathing site already
+     * exist in the database, the bathing site is not saved and a message is displayed.
+     */
+    public void saveEnteredInformation() {
         if (validateMandatoryField()) {
-            //TODO: Implement
-            Context context = requireContext();
-            CharSequence text = "Name: " + name.getText() + "\n"
-                    + "Description: " + description.getText() + "\n"
-                    + "Address: " + address.getText() + "\n"
-                    + "Latitude: " + latitude.getText() + "\n"
-                    + "Longitude: " + longitude.getText() + "\n"
-                    + "Grade: " + grade.getRating();
-            int duration = Toast.LENGTH_SHORT;
+            BathingSite bathingSite = new BathingSite();
+            bathingSite.siteName = name.getText().toString();
+            bathingSite.description = description.getText().toString();
+            bathingSite.address = address.getText().toString();
+            String lat = latitude.getText().toString();
+            if(!lat.isEmpty()){
+                bathingSite.latitude = Double.parseDouble(lat);
+            }
+            String lon = longitude.getText().toString();
+            if(!lon.isEmpty()){
+                bathingSite.longitude = Double.parseDouble(lon);
+            }
+            String tmp = waterTemp.getText().toString();
+            if(!tmp.isEmpty()){
+                bathingSite.waterTemp = Double.parseDouble(tmp);
+            }
 
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-            return true;
+            bathingSite.date = tempDate.getText().toString();
+            bathingSite.grade = grade.getRating();
+            BathingSitesRepository repo = new BathingSitesRepository(getContext());
+            if(repo.BathingSiteFound(bathingSite)){
+
+                CharSequence text = "A bathing site with latitude " + bathingSite.latitude
+                        + " and longitude " + bathingSite.longitude + "already exist.";
+                Toast toast = Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+            else{
+                repo.insertNewBathingSite(bathingSite);
+                clearEntryFields();
+                requireActivity().finish();
+            }
         }
-        return false;
     }
 
     /**
@@ -194,15 +243,17 @@ public class AddBathingSiteFragment extends Fragment {
     }
 
     /**
+     * Use the url in the Settings preference to get weather information
      * Get weather information for the location of the new bathing site.
      * if only coordinates or address is entered used the entered location to get weather
-     * if both cordinates and address are etered use coordinates for better precision
+     * if both coordinates and address are entered use coordinates for better precision
      * use the location to build a URL upon the WEATHER_BASE_URL and download the weather
      * information from the URL
-     *
      * @return return true if address or coordinates are provided else false
      */
     public boolean showWeather() {
+        //Get url to download weather information from settings
+        final String WEATHER_BASE_URL =Helper.getPreferenceSummary(getString(R.string.fetch_weather_key),getString(R.string.fetch_weather_settings_default_summary), requireContext());
         String addressText = address.getText().toString();
         String longitudeText = longitude.getText().toString();
         String latitudeText = latitude.getText().toString();
@@ -254,7 +305,7 @@ public class AddBathingSiteFragment extends Fragment {
          */
         @Override
         protected void onPreExecute() {
-            progressDialog = new CustomProgressDialogView();
+            progressDialog = new CustomProgressDialogView(getText(R.string.getting_weather));
             progressDialog.show(getChildFragmentManager(), "CustomProgressDialogView");
         }
 
@@ -292,10 +343,10 @@ public class AddBathingSiteFragment extends Fragment {
          * Convert the weather information string to JSON and Extracts overcast, temperature, and icon code
          * The icon code is used to build the url get the icon weather icon of the given location
          * the icon image is downloaded asynchronously using the class DownloadImageFromUrlAsyncTask.
-         * When all downloads arre completed, the progress dialog is dismissed
+         * When all downloads are completed, the progress dialog is dismissed
          * The weather icon, overcast and temperature are displayed in a dialog fragment.
          *
-         * @param result String containing weather information returned from doInBackgrond method
+         * @param result String containing weather information returned from doInBackground method
          */
         @Override
         protected void onPostExecute(String result) {
@@ -306,12 +357,12 @@ public class AddBathingSiteFragment extends Fragment {
                 Toast.makeText(getContext(), READ_FILE_ERROR, Toast.LENGTH_SHORT).show();
             } else {
                 try {
-                    JSONObject jsondata = (JSONObject) new JSONTokener(result).nextValue();
-                    JSONArray jsonWeather = jsondata.getJSONArray("weather");
+                    JSONObject jsonData = (JSONObject) new JSONTokener(result).nextValue();
+                    JSONArray jsonWeather = jsonData.getJSONArray("weather");
                     JSONObject weather = (JSONObject) jsonWeather.get(0);
                     String overcast = weather.getString("main");
                     String icon = weather.getString("icon");
-                    JSONObject jsonMain = jsondata.getJSONObject("main");
+                    JSONObject jsonMain = jsonData.getJSONObject("main");
                     int temp =(int) jsonMain.getDouble("temp");
                     URL iconUrl = new URL(WEATHER_ICON_URL + icon + ".png");
                     DownloadImageFromUrlAsyncTask drawableFromUrlAsyncTask = new DownloadImageFromUrlAsyncTask();
@@ -320,7 +371,6 @@ public class AddBathingSiteFragment extends Fragment {
                     // This ensures that the drawable is obtained before the ShowWeatherDialog is displayed
                     final Bitmap bitmap= drawableFromUrlAsyncTask.execute(iconUrl).get();
                     Drawable weatherIcon = new BitmapDrawable(getResources(), bitmap);
-                    TextView textView = new TextView(requireContext());
 
                     //Display weather in a dialog box.
                     new ShowWeatherDialogFragment("Overcast " + overcast + "\n" + temp
@@ -353,7 +403,6 @@ public class AddBathingSiteFragment extends Fragment {
             try {
                 connection = (HttpsURLConnection) url.openConnection();
                 connection.connect();
-
                 InputStream input = connection.getInputStream();
                 return BitmapFactory.decodeStream(input);
             } catch (IOException e) {

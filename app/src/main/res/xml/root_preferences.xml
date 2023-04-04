@@ -1,12 +1,19 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
-    <Preference
+    <EditTextPreference
         app:key="@string/fetch_weather_key"
         app:summary="@string/fetch_weather_settings_default_summary"
         app:title="@string/fetch_weather_header"
+        app:defaultValue="@string/fetch_weather_settings_default_summary"
         app:icon="@drawable/ic_sunny_24"/>
-    <Preference
-        app:key="@string/new_bathing_site_option_key"
-        app:summary="@string/fetch_weather_settings_default_summary"
-        app:title="@string/new_bathing_site_option_header" />
-
+    <EditTextPreference
+        app:key="@string/bathing_site_key"
+        app:defaultValue="@string/download_bathing_site_url"
+        app:summary="@string/download_bathing_site_url"
+        app:title="@string/new_bathing_site_option_header"/>
+    <EditTextPreference
+        app:key="@string/radius_key"
+        app:defaultValue="@string/radius_default_value"
+        app:summary="@string/radius_default_value"
+        app:title="@string/radius_title"
+        app:useSimpleSummaryProvider="false"/>
 </PreferenceScreen>

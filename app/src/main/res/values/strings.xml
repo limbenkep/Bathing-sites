@@ -24,24 +24,32 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="getting_weather">Getting current weather</string>
-
+    <string name="weather_image_content_description">Weather icon</string>
 
     <string name="show_weather_dialog_title">Current weather</string>
 
     <string name="title_activity_settings">SettingsActivity</string>
 
-    <!-- Preference Titles -->
     <string name="fetch_weather_header">Fetch weather data from</string>
     <string name="fetch_weather_key">Fetch_weather</string>
 
     <string name="new_bathing_site_option_header">New bathing site</string>
     <string name="new_bathing_site_option_key">new_bathing_site</string>
+    <string name="bathing_site_key">bathing_site_key</string>
+    <string name="radius_key">radius_key</string>
 
     <!-- Messages Preferences -->
     <string name="fetch_weather_settings_default_summary">https://dt031g.programvaruteknik.nu/bathingsites/weather.php</string>
     <string name="new_bathing_site_option_message">Show new bathing site</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="download_bathing_site_url">https://dt031g.programvaruteknik.nu/bathingsites/download/</string>
+    <string name="download">Download</string>
+    <string name="set_weather_url">Enter new url for weather information</string>
+    <string name="set_new_bathing_sites_download_url">Enter new  url to download bathing site</string>
+    <string name="radius_default_value">50</string>
 
+    <!-- Preference Titles -->
+    <string name="radius_title">Bathing sites search radius from current position in km</string>
+    <string name="map">Map</string>
+    <string name="title_activity_maps">MapsActivity</string>
 
 </resources>

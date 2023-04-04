@@ -15,25 +15,27 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * This class is a custom dialog fragment that displays weather information. The fragment displays
+ * a  title, a weather icon and  text of the weather information
+ * A string containing the weather information and  a drawable containing the weather icon is
+ * passed to the constructor
+ */
 public class ShowWeatherDialogFragment extends DialogFragment {
     private static final String TAG = "ShowWeatherDialogFragment";
     private final String message;
     private final Drawable weatherIcon;
 
-    public ShowWeatherDialogFragment() {
-        super();
-        message=null;
-        weatherIcon=null;
-    }
-
+    /**
+     * Constructor takes two parameter and set them to message and weather icon
+     * @param message passed data information to be displayed
+     * @param icon passed weather icon to be displayed
+     */
     public ShowWeatherDialogFragment(String message, Drawable icon) {
-
         super();
         this.message = message;
         this.weatherIcon = icon;
-        Log.d(TAG, "ShowWeatherDialogFragment: ");
     }
-
 
     @Nullable
     @Override
@@ -59,7 +61,6 @@ public class ShowWeatherDialogFragment extends DialogFragment {
         title.setTypeface(null, Typeface.BOLD);
         textView.setText(message);
         Button ok_button = view.findViewById(R.id.ok_button);
-        ok_button.setOnClickListener(view1 -> requireActivity().finish());
-
+        ok_button.setOnClickListener(view1 -> this.dismiss());
     }
 }
